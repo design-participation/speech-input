@@ -1,10 +1,40 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-// import './index.html';
+import SpeechRecognition from 'react-speech-recognition';
+import PropTypes from 'prop-types';
 
+//initialisation of web speech api
+// const SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 
 const hello= <h1>Hello World</h1>
+
+const propTypes ={
+    transcript: PropTypes.string,
+    resetTranscript: PropTypes.func,
+    browserSupportsSpeechRecognition: PropTypes.bool,
+    startListening: PropTypes.func
+}
+class Dictaphone extends React.Component {
+    render() {
+      const { transcript, resetTranscript, browserSupportsSpeechRecognition , startListening } = this.props
+  
+    //   if (!browserSupportsSpeechRecognition) {
+    //     return null
+    //   }
+  
+      return (
+        <div>
+          <button onClick={startListening}>Reset</button>
+          <span>{transcript}</span>
+        </div>
+      )
+    }
+}
+
+Dictaphone.propTypes=propTypes
+
+export default SpeechRecognition(Dictaphone)
 
 class Recording extends React.Component{
     constructor(props){
@@ -33,7 +63,7 @@ class Recording extends React.Component{
 }
 
 ReactDOM.render(
-    <Recording />,
+    <Dictaphone />,
     document.getElementById('root')
 )
 
