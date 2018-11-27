@@ -1,4 +1,10 @@
 #root{
-    border:1px solid red;
+    border-bottom:2px solid grey;
     text-align:center;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+#sub{
+    text-align: center;
 }
