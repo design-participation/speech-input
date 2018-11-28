@@ -8,3 +8,9 @@
 #sub{
     text-align: center;
 }
+
+#final{
+    width: 100%;
+    border:1px solid blue;
+    height:30px;
+}
