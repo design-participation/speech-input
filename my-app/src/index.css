@@ -1,5 +1,4 @@
 #root{
-    border-bottom:2px solid grey;
     text-align:center;
     box-sizing: border-box;
     padding: 10px;
@@ -10,7 +9,8 @@
 }
 
 #final{
-    width: 100%;
+    margin-top: 10px;
+    height:20vh;
     border:1px solid blue;
     height:30px;
 }
