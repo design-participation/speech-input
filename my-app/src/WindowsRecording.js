@@ -2,7 +2,9 @@ import { createFetchTokenUsingSubscriptionKey, SpeechGrammarList, SpeechRecognit
 import DictateButton from 'react-dictate-button';
 import React from 'react';
 import token from './secrets'
+import './index.css'
 
+const recognition= new SpeechRecognition();
 const extra ={ fetchToken: createFetchTokenUsingSubscriptionKey(token)}
 
 const element= <h1>Hello Windows</h1>
@@ -42,11 +44,17 @@ class App extends React.Component{
 
     handleProgress({results}){
         console.log("Listening");
+        recognition.onsoundstart=()=>{
+            console.log("Magiv");
+        }
         this.setState(()=>({
             error:null,
             final:null,
             interim: results
         }));
+        recognition.onend=()=>{
+            console.log("ending");
+        }
         // if(this.state.start){
         //     _default.onend=()=>{
         //         console.log("continue")
