@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+const {detect} = require('detect-browser');
+const browser = detect();
 
 //initialisation of web speech api for Google Chrome only
 const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -116,5 +118,6 @@ class Recording extends React.Component{
         )
     }
 }
+
 
 export default Recording;
