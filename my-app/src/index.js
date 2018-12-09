@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './GoogleRecording'
+// import App from './GoogleRecording'
 import Test from './WindowsServies'
 
 const {detect} = require('detect-browser');
@@ -17,10 +17,12 @@ class Sorting extends React.Component{
     content(){
         if(browser && browser.name ==='chrome'){
             console.log(browser.name);
+            //rendering google chrome component
+            let AppComp= require('./GoogleRecording').default;
             return(
                 <div>
                     <h3>Chrome!</h3>
-                    <App />
+                    <AppComp />
                 </div>
             )
         }
@@ -31,6 +33,11 @@ class Sorting extends React.Component{
                     <h3>FireFox!</h3>
                     <Test />
                 </div>
+            )
+        }
+        else{
+            return(
+                <h5>Browser not supported!</h5>
             )
         }
     }

@@ -48,8 +48,8 @@ class MicrosoftRecording extends React.Component{
       }
       else{
           //press button to stop recording
-          console.log('stop')
           this.recognition.stop()
+          console.log('stop')
           // this.recognition.end=() =>{
           //     console.log("stopped listening per click")
           // }
