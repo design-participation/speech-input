@@ -1,70 +1,105 @@
 import React from 'react'
-import { createFetchTokenUsingSubscriptionKey,SpeechRecognition } from 'web-speech-cognitive-services';
+import createSpeechRecognitionPonyfill from 'web-speech-cognitive-services/lib/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill';
 import password from './secrets'
 
-const recognition = new SpeechRecognition();
-
-recognition.lang='en-US';
-recognition.fetchToken= createFetchTokenUsingSubscriptionKey(password);
-// recognition.continuous=true;
-
-const element= <h1>Hello Windows</h1>;
-
-//Component to Record Speech
-class Dictate extends React.Component{
+class MicrosoftRecording extends React.Component{
     constructor(props){
-        super(props)
-        this.state={listening:false}
-        this.toggleListen= this.toggleListen.bind(this)
-        this.handleListen = this.handleListen.bind(this)
+      super(props);
+      this.state ={listening:false, message: 'Me'}
+      this.toggleListen= this.toggleListen.bind(this);
+      this.handleListen=this.handleListen.bind(this);
     }
-
-    componentDidMount(){
-        console.log(recognition);
+  //getting speech services API
+    async componentDidMount(){
+      const{
+        SpeechRecognition
+      } = await createSpeechRecognitionPonyfill({
+        //make sure endpoint is correct by stating the region
+        region:'southeastasia',
+        subscriptionKey: password
+      });
+  
+      this.recognition= new SpeechRecognition();
+  
+      this.recognition.interimResults = true;
+      this.recognition.lang ='en-US';
+      
+      
+      // recognition.start();
     }
-
+  
     toggleListen(){
-        console.log("hello")
-        this.setState({
-            //start when button is first clicked and stop listening when clicked again
-            listening: !this.state.listening
-        },()=>{this.handleListen()})
+      console.log("Hello")
+          this.setState({
+              //stop listening when button is pressed
+              listening: !this.state.listening
+          },() => {this.handleListen()})
     }
-
-    //speech recognition logic
+  
     handleListen(){
-        console.log('listening?', this.state.listening)
-        
-        if(this.state.listening){
-            recognition.start()
-            // recognition.onend=()=>{
-            //     console.log("continue listening")
-            //     recognition.start()
-            // }
+      if(this.state.listening){
+        console.log("start")
+        this.recognition.start()
+        //libary doesnt support the following function apparently
+        // this.recognition.speechend=()=> {
+        //     console.log("conitue listening")
+        //     this.recognition.start()
+        // }
+      }
+      else{
+          //press button to stop recording
+          console.log('stop')
+          this.recognition.stop()
+          // this.recognition.end=() =>{
+          //     console.log("stopped listening per click")
+          // }
+  
+      }
+  
+      let finalTranscript='';
+      // this.recognition.onresult =({results})=>{
+      //   console.log(results);
+      // }
+      this.recognition.onresult= event=>{
+        console.log(event);
+        console.log(event.results);
+        let interimTranscript='';
+        let arr= event.results[0]
+        let script = arr[0].transcript;
+        if(arr.isFinal){
+          finalTranscript += script += " ";
+          document.getElementById('interim').innerHTML ="";
+          
         }
         else{
-            console.log('stop')
-            recognition.abort()
-            recognition.onend=()=>{
-                console.log("stop listening per click")
-            }
+          interimTranscript+=script;
+          console.log(interimTranscript);
         }
-
-        recognition.onresult=({results})=>{
-            console.log(results);
-        }
+        //putting the words in the respective div
+        document.getElementById('interim').innerHTML += interimTranscript;
+        document.getElementById('final').innerHTML+=finalTranscript;
+      }
+  
+      this.recognition.onerror = event =>{
+        console.log("Error occured in recognition: " + event.error)
+      }
     }
-
+  
+  
+  
     render(){
-        return(
-            <div>
-                <div>{element}</div>
-                <button className="btn btn-primary" onClick={this.toggleListen}>Press me!</button>
-            </div>
-            
-        )
+      return(
+        <div>
+          <p>Testing of microsoft</p>
+          <button onClick={this.toggleListen}>Click to listen</button>
+          <div id="interim"></div>
+          {/* put this div in the other index.js that encompassess the model */}
+          <div id="final"></div>
+        </div>
+      )
     }
-}
+  
+    
+  }
 
-
-export default Dictate
+export default MicrosoftRecording

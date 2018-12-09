@@ -9,7 +9,7 @@
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1",
     "react-speech-recognition": "^1.0.7",
-    "web-speech-cognitive-services": "^3.0.0"
+    "web-speech-cognitive-services": "^4.0.0-master.a6721a3"
   },
   "scripts": {
     "start": "react-scripts start",
