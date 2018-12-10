@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 // import App from './GoogleRecording'
-import Test from './WindowsServies'
+// import Test from './WindowsServies'
 
 const {detect} = require('detect-browser');
 const browser = detect();
@@ -26,12 +26,13 @@ class Sorting extends React.Component{
                 </div>
             )
         }
-        else if(browser && browser.name ==='firefox'){
+        else if(browser && (browser.name ==='firefox' || browser.name === 'edge')){
             console.log(browser.name);
+            let Microsoft=require('./WindowsServies').default;
             return(
                 <div>
-                    <h3>FireFox!</h3>
-                    <Test />
+                    <h3>{browser.name}</h3>
+                    <Microsoft />
                 </div>
             )
         }

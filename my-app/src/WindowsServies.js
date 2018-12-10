@@ -20,7 +20,7 @@ class MicrosoftRecording extends React.Component{
       });
   
       this.recognition= new SpeechRecognition();
-  
+      console.log(this.recognition)
       this.recognition.interimResults = true;
       this.recognition.lang ='en-US';
       
@@ -29,7 +29,7 @@ class MicrosoftRecording extends React.Component{
     }
   
     toggleListen(){
-      console.log("Hello")
+        console.log("Hello")
           this.setState({
               //stop listening when button is pressed
               listening: !this.state.listening
@@ -40,19 +40,20 @@ class MicrosoftRecording extends React.Component{
       if(this.state.listening){
         console.log("start")
         this.recognition.start()
-        //libary doesnt support the following function apparently
-        // this.recognition.speechend=()=> {
-        //     console.log("conitue listening")
-        //     this.recognition.start()
-        // }
+        //libary doesnt support the following function apparently. Sometimes work sometimes doesnt
+        this.recognition.onend=()=> {
+          this.recognition.start()
+          console.log("continue listening")
+        }
       }
       else{
           //press button to stop recording
           this.recognition.stop()
           console.log('stop')
-          // this.recognition.end=() =>{
-          //     console.log("stopped listening per click")
-          // }
+          //likewise for the following 
+          this.recognition.onend=() =>{
+              console.log("stopped listening per click")
+          }
   
       }
   
