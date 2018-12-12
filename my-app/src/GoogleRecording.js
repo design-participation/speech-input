@@ -84,6 +84,7 @@ class Recording extends React.Component{
             //putting the words in the respective div
             document.getElementById('interim').innerHTML = interimTranscript;
             document.getElementById('final').innerHTML=finalTranscript;
+            // document.getElementById(this.props.name).innerHTML=finalTranscript
             //listening to 'Stop listening' command to stop recognition
             const transcriptArr= finalTranscript.split(' ')
             const stopCmd = transcriptArr.slice(-3,-1)

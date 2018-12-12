@@ -21,7 +21,8 @@ class Sorting extends React.Component{
             return(
                 <div>
                     <h3>Chrome!</h3>
-                    <AppComp />
+                    <div id="test1"></div>
+                    <AppComp name="test1" />
                 </div>
             )
         }
