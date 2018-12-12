@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import App from './GoogleRecording'
-// import Test from './WindowsServies'
+
 
 const {detect} = require('detect-browser');
 const browser = detect();

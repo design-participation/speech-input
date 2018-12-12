@@ -1,3 +1,5 @@
+// Created by Kevin Gunawan
+
 import React from 'react'
 import createSpeechRecognitionPonyfill from 'web-speech-cognitive-services/lib/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill';
 import password from './secrets'
@@ -41,19 +43,19 @@ class MicrosoftRecording extends React.Component{
         console.log("start")
         this.recognition.start()
         //libary doesnt support the following function apparently. Sometimes work sometimes doesnt
-        this.recognition.onend=()=> {
-          this.recognition.start()
-          console.log("continue listening")
-        }
+        // this.recognition.onend=()=> {
+        //   this.recognition.start()
+        //   console.log("continue listening")
+        // }
       }
       else{
           //press button to stop recording
           this.recognition.stop()
           console.log('stop')
           //likewise for the following 
-          this.recognition.onend=() =>{
-              console.log("stopped listening per click")
-          }
+          // this.recognition.onend=() =>{
+          //     console.log("stopped listening per click")
+          // }
   
       }
   
