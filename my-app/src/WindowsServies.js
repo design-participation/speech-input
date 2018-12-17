@@ -4,30 +4,14 @@ import React from 'react'
 import createSpeechRecognitionPonyfill from 'web-speech-cognitive-services/lib/SpeechServices/SpeechToText/createSpeechRecognitionPonyfill';
 import password from './secrets'
 
+
 class MicrosoftRecording extends React.Component{
     constructor(props){
       super(props);
       this.state ={listening:false, message: 'Me'}
       this.toggleListen= this.toggleListen.bind(this);
       this.handleListen=this.handleListen.bind(this);
-    }
-  //getting speech services API
-    async componentDidMount(){
-      const{
-        SpeechRecognition
-      } = await createSpeechRecognitionPonyfill({
-        //make sure endpoint is correct by stating the region
-        region:'southeastasia',
-        subscriptionKey: password
-      });
-  
-      this.recognition= new SpeechRecognition();
-      console.log(this.recognition)
-      this.recognition.interimResults = true;
-      this.recognition.lang ='en-US';
-      
-      
-      // recognition.start();
+      this.stopRecognition =this.stopRecognition.bind(this);
     }
   
     toggleListen(){
@@ -39,56 +23,101 @@ class MicrosoftRecording extends React.Component{
     }
   
     handleListen(){
+      var lastRecognized="";
+
       if(this.state.listening){
+        var SpeechSDK = window.SpeechSDK;
+        var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(password,'southeastasia')
+        // console.log(speechConfig);
+        speechConfig.language="en-US";
+        var audioConfig= SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+        this.recognizer = new SpeechSDK.SpeechRecognizer(speechConfig,audioConfig);
+        // console.log(recognizer);
         console.log("start")
-        this.recognition.start()
-        //libary doesnt support the following function apparently. Sometimes work sometimes doesnt
-        // this.recognition.onend=()=> {
-        //   this.recognition.start()
-        //   console.log("continue listening")
-        // }
+        this.recognizer.recognizing =function(e){
+          console.log(e)
+          console.log("listening")
+          document.getElementById('interim').innerHTML+="(recognizing)Reason: "+ SpeechSDK.ResultReason[e.result.reason] + "Text:" +e.result.text +"\r\n";
+          document.getElementById('final').innerHTML= lastRecognized + e.result.text;
+          
+        };
+  
+        this.recognizer.recognized = function(s,e){
+          console.log(e);
+          console.log("recognised")
+  
+          if(e.result.reason === SpeechSDK.ResultReason.NoMatch){
+            var noMatchDetail = SpeechSDK.NoMatchDetails.fromResult(e.result);
+            document.getElementById('interim').innerHTML+= "(recognized) Reason: "+ SpeechSDK.ResultReason[e.result.reason] +" NoMatchReason: "+SpeechSDK.NoMatchReason[noMatchDetail.reason]+ "\r\n";
+            
+          }
+          else{
+            document.getElementById('interim').innerHTML+="(recognized) Reason: " + SpeechSDK.ResultReason[e.result.reason]+ " Text: "+e.result.text +'\r\n';
+          }
+  
+          lastRecognized += e.result.text +"\r\n";
+          document.getElementById('final').innerHTML+= lastRecognized;
+  
+        }
+  
+        this.recognizer.canceled = function(s,e){
+          console.log(e);
+          document.getElementById('interim').innerHTML+="(cancel) Reason: " +SpeechSDK.CancellationReason[e.reason];
+          if(e.reason === SpeechSDK.CancellationReason.Error){
+            document.getElementById('interim').innerHTML+=": "+ e.errorDetails;  
+  
+          }
+          document.getElementById('interim').innerHTML+="\r\n";
+        }
+  
+        this.recognizer.sessionStarted =function (s,e){
+          console.log(e);
+          document.getElementById('interim').innerHTML+= "(sessionStarted) SessionId: "+ e.sessionId +"\r\n";
+        }
+  
+        this.recognizer.sessionStopped =function(s,e){
+          console.log(e);
+          document.getElementById('interim').innerHTML+= "(sessionStopped) SessionId: "+ e.sessionId +"\r\n";
+  
+        }
+  
+        this.recognizer.speechStartDetected =function(s,e){
+          console.log(e);
+          document.getElementById('interim').innerHTML+= "(speechStartDetected) SessionId: "+ e.sessionId +"\r\n";
+        }
+  
+        this.recognizer.speechEndDetected = function(s,e){
+          console.log(e);
+          document.getElementById('interim').innerHTML+= "(speechEndDetected) SessionId: "+ e.sessionId +"\r\n";
+        }
+    
+        this.recognizer.startContinuousRecognitionAsync();
+
       }
       else{
           //press button to stop recording
-          this.recognition.stop()
+          {this.stopRecognition()}
           console.log('stop')
-          //likewise for the following 
-          // this.recognition.onend=() =>{
-          //     console.log("stopped listening per click")
-          // }
-  
-      }
-  
-      let finalTranscript='';
-      // this.recognition.onresult =({results})=>{
-      //   console.log(results);
-      // }
-      this.recognition.onresult= event=>{
-        console.log(event);
-        console.log(event.results);
-        let interimTranscript='';
-        let arr= event.results[0]
-        let script = arr[0].transcript;
-        if(arr.isFinal){
-          finalTranscript += script += " ";
-          document.getElementById('interim').innerHTML ="";
           
-        }
-        else{
-          interimTranscript+=script;
-          console.log(interimTranscript);
-        }
-        //putting the words in the respective div
-        document.getElementById('interim').innerHTML += interimTranscript;
-        document.getElementById('final').innerHTML+=finalTranscript;
-      }
   
-      this.recognition.onerror = event =>{
-        console.log("Error occured in recognition: " + event.error)
       }
+
+     
     }
   
-  
+    stopRecognition(){
+      this.recognizer.stopContinuousRecognitionAsync(
+        ()=>{
+          this.recognizer.close();
+          this.recognizer=undefined;
+        },
+        (err)=>{
+          this.recognizer.close();
+          this.recognizer=undefined;
+        }
+      )
+      
+    }
   
     render(){
       return(
