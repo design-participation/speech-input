@@ -90,7 +90,7 @@ class MicrosoftRecording extends React.Component{
           console.log(e);
           document.getElementById('interim').innerHTML+= "(speechEndDetected) SessionId: "+ e.sessionId +"\r\n";
         }
-    
+        //the above codes are all events that need to be defined before the use of startContinuousRecognitionAsync
         this.recognizer.startContinuousRecognitionAsync();
 
       }
