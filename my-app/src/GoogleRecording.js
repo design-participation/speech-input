@@ -16,7 +16,9 @@ const recognition= new SpeechRecog();
 //changing the default properties of speech recognition
 recognition.continous=true;
 recognition.interimResults= true;
-recognition.lang='en-US'
+recognition.lang='en-US';
+//introduce upto 10 different answer alternatives
+recognition.maxAlternatives=10;
 
 
 // Component to Record Speech
@@ -68,14 +70,29 @@ class Recording extends React.Component{
             console.log("Listening")
         }
         //getting the words from speech recognition
-        let finalTranscript=''
+        let finalTranscript='';
+        let list="";
         recognition.onresult= event => {
             let interimTranscript=''
+            console.log(event.results);
+            console.log(event.resultIndex);
             //the following for loop is based from the documentation provided by MDN
             for(let i= event.resultIndex; i<event.results.length;i++){
                 const transcript = event.results[i][0].transcript;
+                const confidence = event.results[i][0].confidence;
                 if(event.results[i].isFinal){
-                    finalTranscript+= transcript +=' ';
+                    let finalArray=[];
+                    for(let x=0;x<event.results[i].length;x++){
+                        let script= event.results[i][x].transcript;
+                        let conf= event.results[i][x].confidence;
+                        finalArray.push({text:script,percent:conf})
+                    }
+                    finalTranscript+= transcript +'('+confidence+ ')' +' ';
+                    console.log(finalArray);
+                    finalArray.forEach(element => {
+                        list+="<li>"+element.text+"("+element.percent +")"+"</li>"
+                    });
+                    // document.getElementById('results').innerHTML+= list;
                 }
                 else{
                     interimTranscript += transcript;
@@ -83,12 +100,15 @@ class Recording extends React.Component{
             }
             //putting the words in the respective div
             document.getElementById('interim').innerHTML = interimTranscript;
-            document.getElementById('final').innerHTML=finalTranscript;
+            if(list){
+                document.getElementById('final').innerHTML+="<ol>"+list+"</ol>"+"<hr/>";
+            }
+            list="";
             // document.getElementById(this.props.name).innerHTML=finalTranscript
             //listening to 'Stop listening' command to stop recognition
             const transcriptArr= finalTranscript.split(' ')
             const stopCmd = transcriptArr.slice(-3,-1)
-            console.log('stopCmd',stopCmd)
+            // console.log('stopCmd',stopCmd)
 
             if(stopCmd[0] == 'stop' && stopCmd[1] === 'listening'){
                 recognition.stop()
@@ -114,8 +134,8 @@ class Recording extends React.Component{
                 {/* <h1>{this.state.message}</h1> */}
                 {/* {this.state.active?"Stop":"Record"} */}
                 <button className="btn btn-primary" onClick={this.toggleListen}>{!this.state.listening ? "Press to Record": "Press to Stop"}</button>
-                <div className="col-6" id="final"></div>
                 <div id="interim"></div>
+                <div className="col-6" id="final"></div>
             </div>
             
         )
