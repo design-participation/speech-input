@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+
 const {detect} = require('detect-browser');
 const browser = detect();
 
@@ -19,6 +20,11 @@ recognition.interimResults= true;
 recognition.lang='en-US';
 //introduce upto 10 different answer alternatives
 recognition.maxAlternatives=10;
+
+var ed= require('edit-distance');
+var insert,remove,update;
+insert=remove=function(node){return 1;};
+update= function(stringA,stringB){return stringA!==stringB?1:0;};
 
 
 // Component to Record Speech
@@ -50,7 +56,7 @@ class Recording extends React.Component{
         console.log('listening?', this.state.listening)
 
         if(this.state.listening){
-            recognition.start()
+            recognition.start();
             recognition.onend=()=> {
                 console.log("conitue listening")
                 recognition.start()
@@ -82,15 +88,31 @@ class Recording extends React.Component{
                 const confidence = event.results[i][0].confidence;
                 if(event.results[i].isFinal){
                     let finalArray=[];
+                    let minArray=[];
                     for(let x=0;x<event.results[i].length;x++){
                         let script= event.results[i][x].transcript;
                         let conf= event.results[i][x].confidence;
-                        finalArray.push({text:script,percent:conf})
+                        //getting the min distance
+                        let lev= ed.levenshtein(event.results[i][0].transcript,event.results[i][x].transcript,insert,remove,update);
+                        finalArray.push({text:script,percent:conf,distance:lev.distance})
+                        if(x!=0){
+                            minArray.push(lev.distance);
+                        }
+                        if(x==1){
+                            var wordErrorRates= ed.levenshtein(event.results[i][0].transcript,event.results[i][1].transcript,insert,remove,update).distance;
+                            var wordErr= wordErrorRates / (event.results[i][0].transcript.length);
+                            console.log("wordErr"+wordErr);
+                        }
                     }
-                    finalTranscript+= transcript +'('+confidence+ ')' +' ';
+                    finalTranscript+= transcript;
                     console.log(finalArray);
+                    console.log(minArray);
+                    console.log(Math.min(...minArray));
+                    //calculating the oracle
+                    var oracle= (Math.min(...minArray)/finalTranscript.length);
+                    console.log(oracle);
                     finalArray.forEach(element => {
-                        list+="<li>"+element.text+"("+element.percent +")"+"</li>"
+                        list+="<li>"+element.text+"("+element.percent+","+element.distance +")"+"</li>"
                     });
                     // document.getElementById('results').innerHTML+= list;
                 }
@@ -100,10 +122,16 @@ class Recording extends React.Component{
             }
             //putting the words in the respective div
             document.getElementById('interim').innerHTML = interimTranscript;
+            document.getElementById('final').innerHTML+='<strong>'+finalTranscript+'</strong>';
+            if(oracle){
+                document.getElementById('final').innerHTML+='<p>Oracle: '+oracle+' '+'WER: '+wordErr+'</p>';
+            }
             if(list){
                 document.getElementById('final').innerHTML+="<ol>"+list+"</ol>"+"<hr/>";
             }
+            // document.getElementById('final').innerHTML+=oracle;
             list="";
+            finalTranscript=""
             // document.getElementById(this.props.name).innerHTML=finalTranscript
             //listening to 'Stop listening' command to stop recognition
             const transcriptArr= finalTranscript.split(' ')

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "detect-browser": "^3.0.1",
+    "edit-distance": "^1.0.2",
     "microsoft-speech-browser-sdk": "0.0.12",
     "react": "^16.6.3",
     "react-dictate-button": "^1.1.3",
