@@ -2,22 +2,22 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 // import Windows from './WindowsServies';
 
-const {detect} = require('detect-browser');
+const { detect } = require('detect-browser');
 const browser = detect();
 
 
-class Sorting extends React.Component{
-    constructor(props){
+class Sorting extends React.Component {
+    constructor(props) {
         super(props);
-        this.content= this.content.bind(this);
+        this.content = this.content.bind(this);
     }
 
-    content(){
-        if(browser && browser.name ==='chrome'){
+    content() {
+        if (browser && browser.name === 'chrome') {
             console.log(browser.name);
             //rendering google chrome component
-            let AppComp= require('./GoogleRecording').default;
-            return(
+            let AppComp = require('./GoogleRecording').default;
+            return (
                 <div>
                     <h3>Chrome!</h3>
                     <div id="test1"></div>
@@ -25,25 +25,25 @@ class Sorting extends React.Component{
                 </div>
             )
         }
-        else if(browser && (browser.name ==='firefox' || browser.name === 'edge')){
+        else if (browser && (browser.name === 'firefox' || browser.name === 'edge')) {
             console.log(browser.name);
-            let Microsoft=require('./WindowsServies').default;
-            return(
+            let Microsoft = require('./WindowsServies').default;
+            return (
                 <div>
                     <h3>{browser.name}</h3>
                     <Microsoft />
                 </div>
             )
         }
-        else{
-            return(
+        else {
+            return (
                 <h5>Browser not supported!</h5>
             )
         }
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <div>
                 {this.content()}
             </div>
